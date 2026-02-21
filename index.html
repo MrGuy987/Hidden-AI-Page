@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat Assistant</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #0a0a14;
+            color: #e0e0ff;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #sidebar {
+            width: 260px;
+            background: #0f0f1a;
+            border-right: 1px solid #333366;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        #new-chat {
+            padding: 12px;
+            background: linear-gradient(90deg, #00d4ff, #7c4dff);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 16px;
+        }
+        #chat-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        #chat-list li {
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 8px;
+            background: #1a1a2e;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        #chat-list li.active {
+            background: #333366;
+        }
+        #chat-list li:hover {
+            background: #222244;
+        }
+        #main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        #ai-chat-header {
+            padding: 14px 18px;
+            background: linear-gradient(to right, #1a1a3a, #2a1a4a);
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #ai-chat-title {
+            flex: 1;
+            text-align: center;
+            cursor: pointer;
+        }
+        #clear-btn {
+            cursor: pointer;
+            font-size: 18px;
+            color: #aaa;
+            opacity: 0.8;
+            margin: 0 6px;
+        }
+        #clear-btn:hover {
+            opacity: 1;
+            color: #fff;
+        }
+        #ai-chat-messages {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            background: #0a0a14;
+            font-size: 14px;
+            display: flex;
+            flex-direction: column;
+        }
+        .ai-msg {
+            margin: 10px 0;
+            padding: 10px 14px;
+            border-radius: 14px;
+            max-width: 85%;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: 0.3s;
+            white-space: pre-wrap;
+        }
+        .ai-msg.visible {
+            opacity: 1;
+            transform: none;
+        }
+        .user {
+            background: #004080;
+            align-self: flex-end;
+        }
+        .bot {
+            background: #1e1e38;
+            align-self: flex-start;
+        }
+        #ai-chat-input {
+            display: flex;
+            border-top: 1px solid #222;
+            padding: 12px;
+            background: #111;
+        }
+        .input-field {
+            flex: 1;
+            padding: 12px;
+            background: #1a1a2e;
+            border: none;
+            border-radius: 12px;
+            color: #eee;
+        }
+        .send-btn {
+            padding: 12px 18px;
+            background: linear-gradient(90deg, #00d4ff, #7c4dff);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+        #ai-thinking {
+            display: none;
+            text-align: center;
+            padding: 6px;
+            color: #888;
+            font-style: italic;
+        }
+        #model-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000000;
+        }
+        #model-modal {
+            background: #0f0f1a;
+            border: 1px solid #333366;
+            border-radius: 16px;
+            width: 400px;
+            padding: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            color: #e0e0ff;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        #model-modal h3 {
+            margin: 0 0 16px;
+            color: #00d4ff;
+            text-align: center;
+        }
+        #model-modal label {
+            display: block;
+            margin: 16px 0 8px;
+        }
+        #model-modal select, #model-modal input {
+            width: 100%;
+            background: #1a1a2e;
+            border: none;
+            border-radius: 12px;
+            color: #eee;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        #model-modal select {
+            height: 40px;
+            line-height: 1.4;
+            padding: 0 10px;
+        }
+        #model-modal select option {
+            background: #1a1a2e;
+            color: #eee;
+        }
+        #model-modal input {
+            padding: 10px;
+        }
+        #model-modal .buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        #model-modal button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        #model-modal #ok-btn {
+            background: linear-gradient(90deg, #00d4ff, #7c4dff);
+            color: white;
+        }
+        #model-modal #cancel-btn {
+            background: #333366;
+            color: #aaa;
+        }
+        #features {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-top: 1px solid #222;
+            background: #111;
+        }
+        #features label {
+            margin-right: 16px;
+            color: #aaa;
+        }
+    </style>
+    <script src="https://js.puter.com/v2/"></script>
+</head>
+<body>
+    <div id="sidebar">
+        <button id="new-chat">New Chat</button>
+        <ul id="chat-list"></ul>
+    </div>
+    <div id="main">
+        <div id="ai-chat-header">
+            <span id="clear-btn">🗑</span>
+            <span id="ai-chat-title">AI Assistant</span>
+        </div>
+        <div id="ai-chat-messages"></div>
+        <div id="ai-thinking">AI is thinking…</div>
+        <div id="features">
+            <label><input type="checkbox" id="reasoning-mode"> Step-by-step Reasoning</label>
+            <label><input type="checkbox" id="websearch-mode"> Enable Web Search</label>
+        </div>
+        <div id="ai-chat-input">
+            <input class="input-field" id="input-field" placeholder="Ask anything…" />
+            <button class="send-btn" id="send-btn">Send</button>
+        </div>
+    </div>
+    <div id="model-modal-overlay">
+        <div id="model-modal">
+            <h3>Change AI Model</h3>
+            <label for="model-select">Quick pick (fast → accurate):</label>
+            <select id="model-select">
+                <option value="gpt-5-nano">gpt-5-nano (fastest/lightweight)</option>
+                <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite (very fast)</option>
+                <option value="gpt-5">gpt-5 (balanced speed/quality)</option>
+                <option value="gemini-2.5-flash">gemini-2.5-flash (fast & smart)</option>
+                <option value="gpt-5-pro">gpt-5-pro (high-end)</option>
+                <option value="gemini-2.5-pro">gemini-2.5-pro (advanced)</option>
+                <option value="">Custom / reset to default</option>
+            </select>
+            <label for="model-input" style="margin-top:16px;">Or type custom name:</label>
+            <input id="model-input" type="text" placeholder="gpt-5-nano" autofocus />
+            <div class="buttons">
+                <button id="cancel-btn">Cancel</button>
+                <button id="ok-btn">OK</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        async function initChat() {
+            if (typeof puter === "undefined") return;
+
+            let currentModel = localStorage.getItem('currentModel') || "gpt-5";
+            let chats = JSON.parse(localStorage.getItem('chats')) || [];
+            let currentChatId = localStorage.getItem('currentChatId') || null;
+
+            const msgs = document.getElementById("ai-chat-messages");
+            const input = document.getElementById("input-field");
+            const btn = document.getElementById("send-btn");
+            const thinking = document.getElementById("ai-thinking");
+            const chatList = document.getElementById("chat-list");
+            const reasoningCheckbox = document.getElementById("reasoning-mode");
+            const websearchCheckbox = document.getElementById("websearch-mode");
+            const modelOverlay = document.getElementById("model-modal-overlay");
+            const modelSelect = document.getElementById("model-select");
+            const modelInput = document.getElementById("model-input");
+            const okBtn = document.getElementById("ok-btn");
+            const cancelBtn = document.getElementById("cancel-btn");
+
+            function saveChats() {
+                localStorage.setItem('chats', JSON.stringify(chats));
+                localStorage.setItem('currentChatId', currentChatId);
+                localStorage.setItem('currentModel', currentModel);
+            }
+
+            function addMessage(text, cls) {
+                const d = document.createElement("div");
+                d.className = "ai-msg " + cls;
+                d.innerHTML = text.replace(/\n/g, "<br>");
+                msgs.appendChild(d);
+                setTimeout(() => d.classList.add("visible"), 10);
+                msgs.scrollTop = msgs.scrollHeight;
+                return d;
+            }
+
+            function getCurrentChat() {
+                return chats.find(c => c.id === currentChatId) || { messages: [] };
+            }
+
+            function updateChatList() {
+                chatList.innerHTML = '';
+                chats.forEach(chat => {
+                    const li = document.createElement('li');
+                    li.textContent = chat.title || 'Untitled Chat';
+                    li.dataset.id = chat.id;
+                    if (chat.id === currentChatId) li.classList.add('active');
+                    li.onclick = () => switchChat(chat.id);
+                    chatList.appendChild(li);
+                });
+            }
+
+            function switchChat(id) {
+                currentChatId = id;
+                saveChats();
+                loadMessages();
+                updateChatList();
+            }
+
+            function loadMessages() {
+                msgs.innerHTML = '';
+                getCurrentChat().messages.forEach(msg => {
+                    addMessage(`<b>${msg.role === 'user' ? 'You' : 'AI'}:</b> ${msg.content}`, msg.role === 'user' ? 'user' : 'bot');
+                });
+            }
+
+            function newChat() {
+                const id = Date.now().toString();
+                chats.push({ id, title: '', messages: [] });
+                switchChat(id);
+            }
+
+            async function generateTitle(query) {
+                const resp = await puter.ai.chat(`Summarize this query in 5 words: ${query}`, { model: currentModel });
+                return resp;
+            }
+
+            async function performWebSearch(query) {
+                try {
+                    const resp = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_redirect=1`);
+                    const data = await resp.json();
+                    return data.Abstract || data.Results.map(r => r.FirstURL + ': ' + r.Text).join('\n') || 'No results found.';
+                } catch (e) {
+                    return 'Web search failed: ' + e.message;
+                }
+            }
+
+            async function send() {
+                const t = input.value.trim();
+                if (!t) return;
+                input.value = "";
+                btn.disabled = true;
+
+                let currentChat = getCurrentChat();
+                currentChat.messages.push({ role: 'user', content: t });
+                addMessage(`<b>You:</b> ${t}`, 'user');
+
+                if (!currentChat.title) {
+                    currentChat.title = await generateTitle(t);
+                    updateChatList();
+                }
+
+                thinking.style.display = "block";
+
+                let systemPrompt = '';
+                if (reasoningCheckbox.checked) {
+                    systemPrompt = 'Think step by step before answering. ';
+                }
+
+                let searchResult = '';
+                if (websearchCheckbox.checked) {
+                    searchResult = await performWebSearch(t);
+                    systemPrompt += `Use this web search result: ${searchResult}\n`;
+                }
+
+                let history = currentChat.messages.map(m => `${m.role}: ${m.content}`).join('\n\n');
+                let fullPrompt = systemPrompt + history + '\n\nassistant:';
+
+                try {
+                    const options = { model: currentModel, stream: true };
+                    const resp = await puter.ai.chat(fullPrompt, options);
+
+                    let botMsg = { role: 'assistant', content: '' };
+                    currentChat.messages.push(botMsg);
+                    let botDiv = addMessage(`<b>AI:</b> `, 'bot');
+
+                    for await (const chunk of resp) {
+                        botMsg.content += chunk.text || '';
+                        botDiv.innerHTML = `<b>AI:</b> ${botMsg.content.replace(/\n/g, "<br>")}`;
+                        msgs.scrollTop = msgs.scrollHeight;
+                    }
+                } catch (e) {
+                    addMessage(`Error: ${e.message}`, 'bot');
+                }
+
+                thinking.style.display = "none";
+                btn.disabled = false;
+                saveChats();
+            }
+
+            function clearChat() {
+                let currentChat = getCurrentChat();
+                currentChat.messages = [];
+                loadMessages();
+                saveChats();
+            }
+
+            async function showModelModal() {
+                modelInput.value = currentModel;
+                modelSelect.value = currentModel;
+                modelOverlay.style.display = 'flex';
+                modelInput.focus();
+            }
+
+            modelSelect.onchange = () => {
+                if (modelSelect.value) modelInput.value = modelSelect.value;
+            };
+
+            okBtn.onclick = () => {
+                const val = modelInput.value.trim() || "gpt-5-nano";
+                currentModel = val;
+                modelOverlay.style.display = 'none';
+                saveChats();
+                addMessage(`<i>Model changed to <b>${currentModel}</b>.</i>`, "bot");
+            };
+
+            cancelBtn.onclick = () => {
+                modelOverlay.style.display = 'none';
+            };
+
+            modelOverlay.onclick = e => {
+                if (e.target === modelOverlay) modelOverlay.style.display = 'none';
+            };
+
+            document.getElementById("new-chat").onclick = newChat;
+            document.getElementById("clear-btn").onclick = clearChat;
+            document.getElementById("ai-chat-title").onclick = showModelModal;
+            btn.onclick = send;
+            input.onkeydown = e => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    send();
+                }
+            };
+
+            if (chats.length === 0) newChat();
+            else if (!currentChatId || !chats.find(c => c.id === currentChatId)) {
+                newChat();
+            } else {
+                loadMessages();
+            }
+            updateChatList();
+
+            addMessage(`<i>Using model: <b>${currentModel}</b> • Click "AI Assistant" to change model. Enable features below as needed.</i>`, "bot");
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initChat);
+        } else {
+            initChat();
+        }
+    </script>
+</body>
+</html>
