@@ -253,35 +253,67 @@
             <button class="send-btn" id="send-btn">Send</button>
         </div>
     </div>
+
     <div id="model-modal-overlay">
         <div id="model-modal">
             <h3>Change AI Model</h3>
-            <label for="model-select">Quick pick (fast → accurate):</label>
+            <label for="model-select">Quick pick:</label>
             <select id="model-select">
-                <option value="gpt-5-nano">gpt-5-nano (fastest/lightweight)</option>
-                <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite (very fast)</option>
-                <option value="gpt-5">gpt-5 (balanced speed/quality)</option>
-                <option value="gemini-2.5-flash">gemini-2.5-flash (fast & smart)</option>
-                <option value="gpt-5-pro">gpt-5-pro (high-end)</option>
-                <option value="gemini-2.5-pro">gemini-2.5-pro (advanced)</option>
-                <option value="">Custom / reset to default</option>
+                <option value="gpt-4o-mini">gpt-4o-mini (fast & cheap)</option>
+                <option value="gpt-4o">gpt-4o (high quality)</option>
+                <option value="gemini-1.5-flash">gemini-1.5-flash (very fast)</option>
+                <option value="gemini-1.5-pro">gemini-1.5-pro (advanced)</option>
+                <option value="">Custom model name</option>
             </select>
-            <label for="model-input" style="margin-top:16px;">Or type custom name:</label>
-            <input id="model-input" type="text" placeholder="gpt-5-nano" autofocus />
+            <label for="model-input" style="margin-top:16px;">Custom model:</label>
+            <input id="model-input" type="text" placeholder="e.g. gpt-4o-mini" autofocus />
             <div class="buttons">
                 <button id="cancel-btn">Cancel</button>
                 <button id="ok-btn">OK</button>
             </div>
         </div>
     </div>
+
     <script>
         async function initChat() {
-            if (typeof puter === "undefined") return;
+            if (typeof puter === "undefined") {
+                document.body.innerHTML = '<h1 style="color:white;text-align:center;padding:40px;">Puter.js failed to load. Check your internet or try https://js.puter.com/v2/</h1>';
+                return;
+            }
 
-            let currentModel = localStorage.getItem('currentModel') || "gpt-5";
-            let chats = JSON.parse(localStorage.getItem('chats')) || [];
-            let currentChatId = localStorage.getItem('currentChatId') || null;
+            // ────────────────────────────────────────────────
+            // Storage detection
+            // ────────────────────────────────────────────────
+            function canUseStorage() {
+                try {
+                    const test = '__storage_test__';
+                    localStorage.setItem(test, test);
+                    localStorage.removeItem(test);
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+            const storageAvailable = canUseStorage();
 
+            // ────────────────────────────────────────────────
+            // State
+            // ────────────────────────────────────────────────
+            let currentModel = storageAvailable 
+                ? (localStorage.getItem('currentModel') || "gpt-4o-mini") 
+                : "gpt-4o-mini";
+
+            let chats = storageAvailable 
+                ? (JSON.parse(localStorage.getItem('chats')) || []) 
+                : [];
+
+            let currentChatId = storageAvailable 
+                ? localStorage.getItem('currentChatId') || null 
+                : null;
+
+            // ────────────────────────────────────────────────
+            // DOM elements
+            // ────────────────────────────────────────────────
             const msgs = document.getElementById("ai-chat-messages");
             const input = document.getElementById("input-field");
             const btn = document.getElementById("send-btn");
@@ -295,15 +327,19 @@
             const okBtn = document.getElementById("ok-btn");
             const cancelBtn = document.getElementById("cancel-btn");
 
-            function saveChats() {
+            // ────────────────────────────────────────────────
+            // Helpers
+            // ────────────────────────────────────────────────
+            function saveState() {
+                if (!storageAvailable) return;
                 localStorage.setItem('chats', JSON.stringify(chats));
                 localStorage.setItem('currentChatId', currentChatId);
                 localStorage.setItem('currentModel', currentModel);
             }
 
-            function addMessage(text, cls) {
+            function addMessage(text, cls = "bot") {
                 const d = document.createElement("div");
-                d.className = "ai-msg " + cls;
+                d.className = `ai-msg ${cls}`;
                 d.innerHTML = text.replace(/\n/g, "<br>");
                 msgs.appendChild(d);
                 setTimeout(() => d.classList.add("visible"), 10);
@@ -319,7 +355,7 @@
                 chatList.innerHTML = '';
                 chats.forEach(chat => {
                     const li = document.createElement('li');
-                    li.textContent = chat.title || 'Untitled Chat';
+                    li.textContent = chat.title || 'New Chat';
                     li.dataset.id = chat.id;
                     if (chat.id === currentChatId) li.classList.add('active');
                     li.onclick = () => switchChat(chat.id);
@@ -329,7 +365,7 @@
 
             function switchChat(id) {
                 currentChatId = id;
-                saveChats();
+                saveState();
                 loadMessages();
                 updateChatList();
             }
@@ -347,26 +383,54 @@
                 switchChat(id);
             }
 
+            async function ensureSignedIn() {
+                if (puter.auth.isSignedIn()) return true;
+                try {
+                    addMessage("<i>Opening sign-in window… Please log in to Puter.com</i>", "bot");
+                    await puter.auth.signIn();
+                    addMessage("<i>Successfully signed in! You can now use AI features.</i>", "bot");
+                    return true;
+                } catch (err) {
+                    addMessage(`<i>Sign-in failed: ${err.message || 'Popup blocked or cancelled'}</i>`, "bot");
+                    console.error(err);
+                    return false;
+                }
+            }
+
             async function generateTitle(query) {
-                const resp = await puter.ai.chat(`Summarize this query in 5 words: ${query}`, { model: currentModel });
-                return resp;
+                try {
+                    const resp = await puter.ai.chat(`Summarize this user query in 4-6 words: ${query}`, { model: currentModel });
+                    return resp.trim();
+                } catch {
+                    return "New Chat";
+                }
             }
 
             async function performWebSearch(query) {
                 try {
                     const resp = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_redirect=1`);
                     const data = await resp.json();
-                    return data.Abstract || data.Results.map(r => r.FirstURL + ': ' + r.Text).join('\n') || 'No results found.';
+                    let result = data.Abstract || '';
+                    if (!result && data.RelatedTopics?.length) {
+                        result = data.RelatedTopics.map(t => t.Text).join('\n');
+                    }
+                    return result || 'No useful web results found.';
                 } catch (e) {
-                    return 'Web search failed: ' + e.message;
+                    return `Web search error: ${e.message}`;
                 }
             }
 
             async function send() {
                 const t = input.value.trim();
                 if (!t) return;
+
                 input.value = "";
                 btn.disabled = true;
+
+                if (!(await ensureSignedIn())) {
+                    btn.disabled = false;
+                    return;
+                }
 
                 let currentChat = getCurrentChat();
                 currentChat.messages.push({ role: 'user', content: t });
@@ -379,79 +443,80 @@
 
                 thinking.style.display = "block";
 
-                let systemPrompt = '';
-                if (reasoningCheckbox.checked) {
-                    systemPrompt = 'Think step by step before answering. ';
-                }
+                let systemPrompt = reasoningCheckbox.checked 
+                    ? "Think step by step. Explain your reasoning clearly before giving the final answer.\n" 
+                    : "";
 
-                let searchResult = '';
+                let searchResult = "";
                 if (websearchCheckbox.checked) {
                     searchResult = await performWebSearch(t);
-                    systemPrompt += `Use this web search result: ${searchResult}\n`;
+                    systemPrompt += `Relevant web information:\n${searchResult}\n\n`;
                 }
 
-                let history = currentChat.messages.map(m => `${m.role}: ${m.content}`).join('\n\n');
-                let fullPrompt = systemPrompt + history + '\n\nassistant:';
+                const history = currentChat.messages.map(m => `${m.role}: ${m.content}`).join('\n\n');
+                const fullPrompt = systemPrompt + history + '\n\nassistant:';
 
                 try {
                     const options = { model: currentModel, stream: true };
-                    const resp = await puter.ai.chat(fullPrompt, options);
+                    const stream = await puter.ai.chat(fullPrompt, options);
 
                     let botMsg = { role: 'assistant', content: '' };
                     currentChat.messages.push(botMsg);
                     let botDiv = addMessage(`<b>AI:</b> `, 'bot');
 
-                    for await (const chunk of resp) {
-                        botMsg.content += chunk.text || '';
-                        botDiv.innerHTML = `<b>AI:</b> ${botMsg.content.replace(/\n/g, "<br>")}`;
-                        msgs.scrollTop = msgs.scrollHeight;
+                    for await (const chunk of stream) {
+                        if (chunk.text) {
+                            botMsg.content += chunk.text;
+                            botDiv.innerHTML = `<b>AI:</b> ${botMsg.content.replace(/\n/g, "<br>")}`;
+                            msgs.scrollTop = msgs.scrollHeight;
+                        }
                     }
                 } catch (e) {
-                    addMessage(`Error: ${e.message}`, 'bot');
+                    addMessage(`<b>Error:</b> ${e.message || 'Failed to get response'}`, 'bot');
                 }
 
                 thinking.style.display = "none";
                 btn.disabled = false;
-                saveChats();
+                saveState();
             }
 
             function clearChat() {
                 let currentChat = getCurrentChat();
                 currentChat.messages = [];
                 loadMessages();
-                saveChats();
+                saveState();
             }
 
             async function showModelModal() {
                 modelInput.value = currentModel;
-                modelSelect.value = currentModel;
+                modelSelect.value = currentModel in ["gpt-4o-mini","gpt-4o","gemini-1.5-flash","gemini-1.5-pro"] 
+                    ? currentModel : "";
                 modelOverlay.style.display = 'flex';
                 modelInput.focus();
             }
+
+            // ────────────────────────────────────────────────
+            // Event listeners
+            // ────────────────────────────────────────────────
+            document.getElementById("new-chat").onclick = newChat;
+            document.getElementById("clear-btn").onclick = clearChat;
+            document.getElementById("ai-chat-title").onclick = showModelModal;
 
             modelSelect.onchange = () => {
                 if (modelSelect.value) modelInput.value = modelSelect.value;
             };
 
             okBtn.onclick = () => {
-                const val = modelInput.value.trim() || "gpt-5-nano";
+                const val = modelInput.value.trim() || "gpt-4o-mini";
                 currentModel = val;
                 modelOverlay.style.display = 'none';
-                saveChats();
-                addMessage(`<i>Model changed to <b>${currentModel}</b>.</i>`, "bot");
+                saveState();
+                addMessage(`<i>Model changed to <b>${currentModel}</b></i>`, "bot");
             };
 
-            cancelBtn.onclick = () => {
-                modelOverlay.style.display = 'none';
-            };
+            cancelBtn.onclick = () => modelOverlay.style.display = 'none';
+            modelOverlay.onclick = e => { if (e.target === modelOverlay) modelOverlay.style.display = 'none'; };
 
-            modelOverlay.onclick = e => {
-                if (e.target === modelOverlay) modelOverlay.style.display = 'none';
-            };
-
-            document.getElementById("new-chat").onclick = newChat;
-            document.getElementById("clear-btn").onclick = clearChat;
-            document.getElementById("ai-chat-title").onclick = showModelModal;
             btn.onclick = send;
             input.onkeydown = e => {
                 if (e.key === "Enter" && !e.shiftKey) {
@@ -460,15 +525,25 @@
                 }
             };
 
-            if (chats.length === 0) newChat();
-            else if (!currentChatId || !chats.find(c => c.id === currentChatId)) {
-                newChat();
-            } else {
-                loadMessages();
+            // ────────────────────────────────────────────────
+            // Startup
+            // ────────────────────────────────────────────────
+            if (!storageAvailable) {
+                addMessage(`<i><b>Warning:</b> Browser storage is blocked (likely sandbox/iframe). Chats and model choice reset on refresh.</i>`, "bot");
             }
+
+            if (chats.length === 0) newChat();
+            else if (!currentChatId || !chats.find(c => c.id === currentChatId)) newChat();
+            else loadMessages();
+
             updateChatList();
 
-            addMessage(`<i>Using model: <b>${currentModel}</b> • Click "AI Assistant" to change model. Enable features below as needed.</i>`, "bot");
+            addMessage(
+                `<i>Using model: <b>${currentModel}</b><br>` +
+                `Click title to change model • Enable features below as needed.<br>` +
+                `${storageAvailable ? '' : 'Persistence disabled in this environment.'}</i>`, 
+                "bot"
+            );
         }
 
         if (document.readyState === 'loading') {
