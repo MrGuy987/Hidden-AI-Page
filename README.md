@@ -1,4 +1,4 @@
-# Ai-page
+# Hidden Disguised AI Page
 🕶️ Hidden AI Page
 
 A lightweight stealth interface designed to keep AI assistance accessible — without being obvious.
