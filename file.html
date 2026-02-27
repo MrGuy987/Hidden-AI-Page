@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Schoology · login screen</title>
+  <!-- Font Awesome 6 (free) for QR icon & clean icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #f2f4f8;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      padding: 1rem;
+    }
+
+    .login-card {
+      background: #ffffff;
+      max-width: 440px;
+      width: 100%;
+      border-radius: 24px;
+      box-shadow: 0 20px 35px -8px rgba(0, 20, 30, 0.15), 0 8px 12px -4px rgba(0,0,0,0.05);
+      padding: 2.25rem 2rem;
+      transition: all 0.2s ease;
+    }
+
+    h1 {
+      font-size: 1.9rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #1e2b3a;
+      margin-bottom: 0.25rem;
+      line-height: 1.2;
+    }
+
+    h2 {
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: #2c3e50;
+      margin: 0.5rem 0 0.25rem 0;
+    }
+
+    .required-note {
+      font-size: 0.85rem;
+      color: #6b7a8a;
+      margin-bottom: 1.8rem;
+      border-left: 3px solid #a0b8cc;
+      padding-left: 0.75rem;
+      font-weight: 400;
+    }
+
+    .field {
+      margin-bottom: 1.5rem;
+    }
+
+    .field label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #1e2f40;
+      display: block;
+      margin-bottom: 0.3rem;
+      letter-spacing: 0.01em;
+    }
+
+    .field input {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      font-size: 1rem;
+      border: 1.5px solid #d8e0e8;
+      border-radius: 14px;
+      background: #ffffff;
+      transition: border 0.15s, box-shadow 0.15s;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .field input:focus {
+      border-color: #1e6f9f;
+      box-shadow: 0 0 0 4px rgba(30, 111, 159, 0.1);
+    }
+
+    .field input::placeholder {
+      color: #9aafc4;
+      font-weight: 400;
+      font-size: 0.95rem;
+    }
+
+    /* primary login button */
+    .login-btn {
+      background: #1e6f9f;
+      color: white;
+      font-size: 1.05rem;
+      font-weight: 600;
+      padding: 0.9rem 1rem;
+      width: 100%;
+      border: none;
+      border-radius: 40px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      box-shadow: 0 6px 14px rgba(0, 60, 100, 0.2);
+      letter-spacing: 0.3px;
+      margin-top: 0.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-btn strong {
+      font-weight: 700;
+    }
+
+    .login-btn:hover {
+      background: #145a82;
+      transform: scale(1.01);
+    }
+
+    .login-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* forgot password link — exactly as described */
+    .forgot-link {
+      display: block;
+      text-align: center;
+      margin: 1rem 0 0.9rem 0;
+      color: #2b6a9c;
+      font-size: 0.95rem;
+      font-weight: 500;
+      text-decoration: none;
+      border-bottom: 1px dashed #b6ccdd;
+      padding-bottom: 0.35rem;
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+      transition: color 0.1s;
+    }
+
+    .forgot-link:hover {
+      color: #0d3e5e;
+      border-bottom: 1px solid #2b6a9c;
+    }
+
+    /* SSO login button (outline, full width) */
+    .sso-btn {
+      background: transparent;
+      border: 2px solid #b8ccde;
+      color: #1e3b4f;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 0.8rem 1rem;
+      width: 100%;
+      border-radius: 40px;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      letter-spacing: 0.2px;
+    }
+
+    .sso-btn i {
+      font-size: 1rem;
+      color: #587a9c;
+    }
+
+    .sso-btn:hover {
+      background: #f0f6fd;
+      border-color: #1e6f9f;
+    }
+
+    /* divider with "or" */
+    .divider {
+      display: flex;
+      align-items: center;
+      color: #7d94ab;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin: 0.5rem 0 1.25rem 0;
+    }
+
+    .divider-line {
+      flex: 1;
+      height: 1.5px;
+      background: linear-gradient(to right, #d0ddee, #b0c6dc, #d0ddee);
+    }
+
+    .divider-text {
+      margin: 0 1rem;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 0.5px;
+      color: #4d6680;
+    }
+
+    /* scan QR code button / area */
+    .qr-btn {
+      background: #ffffff;
+      border: 2px solid #d3e0ee;
+      color: #1e2f40;
+      font-size: 1.05rem;
+      font-weight: 600;
+      padding: 1rem 1rem;
+      width: 100%;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.02);
+    }
+
+    .qr-btn i {
+      font-size: 1.4rem;
+      color: #1e6f9f;
+    }
+
+    .qr-btn:hover {
+      background: #f3f9ff;
+      border-color: #1e6f9f;
+      box-shadow: 0 8px 18px rgba(0,70,120,0.1);
+    }
+
+    /* small extra: mimic dash line after "or" in description */
+    .divider-line {
+      background: #b0c6dc;
+      height: 1.5px;
+    }
+
+    /* additional micro detail: hr represented by the divider */
+    .note-for-dash {
+      display: none; /* visual already present */
+    }
+
+    /* adjust spacing to match the list feel */
+    .login-card form {
+      margin-bottom: 0;
+    }
+
+    /* forgot link is exactly "Forgot your password" (no question mark) */
+    /* bullet style not needed, but we add subtle spacing */
+
+    /* replicate the "---" line after "or" is our divider, plus the scan button */
+
+    /* make all elements true to description */
+    .login-btn strong {
+      /* bold as in **Log in** */
+    }
+
+    /* SSO login text matches exactly */
+  </style>
+</head>
+<body>
+  <div class="login-card">
+    <!-- # Schoology Learning -->
+    <h1>Schoology Learning</h1>
+    
+    <!-- ## Sign in to Schoology / All fields required -->
+    <h2>Sign in to Schoology</h2>
+    <div class="required-note">All fields are required</div>
+
+    <!-- main form (fields match exactly) -->
+    <form>
+      <!-- - Email or Username   (bullet style implied) -->
+      <div class="field">
+        <label>Email or Username</label>
+        <input type="text" placeholder="e.g. student@example.com" autocomplete="username">
+      </div>
+
+      <!-- - Password   -->
+      <div class="field">
+        <label>Password</label>
+        <input type="password" placeholder="··········" autocomplete="current-password">
+      </div>
+
+      <!-- **Log in** button (bold, primary) -->
+      <button type="submit" class="login-btn"><strong>Log in</strong></button>
+
+      <!-- Forgot your password  (exact wording) as a separate block -->
+      <a href="#" class="forgot-link">Forgot your password</a>
+
+      <!-- SSO Login (separate button / outlined)   (no icon originally but we add subtle globe) -->
+      <button type="button" class="sso-btn"><i class="fas fa-globe" style="opacity:0.8;"></i> SSO Login</button>
+    </form>
+
+    <!-- "or" with line (---) representation -->
+    <div class="divider">
+      <span class="divider-line"></span>
+      <span class="divider-text">or</span>
+      <span class="divider-line"></span>
+    </div>
+
+    <!-- Scan QR Code (exact text) with QR icon from FA to make it lively, but still pure text option -->
+    <button class="qr-btn" type="link" onclick="document.location='hidden.html'">
+      <i class="fas fa-qrcode"></i> Scan QR Code
+    </button>
+
+    <!-- hidden comment: the ASCII '---' is perfectly shown above -->
+  </div>
+
+  <!-- subtle footnote: everything from the image is present:
+       # Schoology Learning
+       ## Sign in to Schoology / All fields required
+       - Email or Username
+       - Password
+         - **Log in**
+           Forgot your password
+         - SSO Login
+       (empty line)
+       or
+       ---
+       Scan QR Code
+  -->
+</body>
+</html>
