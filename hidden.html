@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schoology Plus+</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://js.puter.com/v2/"></script>
+    <link rel="icon" type="image/x-icon" href="Images/favicon.png">
+</head>
+<body>
+    <div id="sidebar">
+        <button id="new-chat">New Chat</button>
+        <ul id="chat-list"></ul>
+    </div>
+    <div id="main">
+        <div id="ai-chat-header">
+            <span id="clear-btn">🗑</span>
+            <span id="ai-chat-title">Hidden Secret AI</span>
+        </div>
+        <div id="ai-chat-messages"></div>
+        <div id="ai-thinking">AI is thinking…</div>
+        <div id="features">
+            <label><input type="checkbox" id="reasoning-mode"> Reasoning</label>
+            <label><input type="checkbox" id="websearch-mode"> Search the web</label>
+        </div>
+        <div id="ai-chat-input">
+            <input class="input-field" id="input-field" placeholder="Ask anything…" />
+            <button class="send-btn" id="send-btn">Send</button>
+        </div>
+    </div>
+
+    <div id="model-modal-overlay">
+        <div id="model-modal">
+            <h3>Change AI Model</h3>
+            <label for="model-select">Models</label>
+            <select id="model-select">
+                <option value="gpt-4o-mini">gpt-4o-mini (fast & cheap)</option>
+                <option value="gpt-4o">gpt-4o (high quality)</option>
+                <option value="gemini-1.5-flash">gemini-1.5-flash (very fast)</option>
+                <option value="gemini-1.5-pro">gemini-1.5-pro (advanced)</option>
+                <option value="">Custom model name</option>
+            </select>
+            <label for="model-input" style="margin-top:16px;">Custom model:</label>
+            <input id="model-input" type="text" placeholder="e.g. gpt-4o-mini" autofocus />
+            <div class="buttons">
+                <button id="cancel-btn">Cancel</button>
+                <button id="ok-btn">OK</button>
+            </div>
+        </div>
+    </div>
+
+<script src="script.js"></script>
+</body>
+</html>
