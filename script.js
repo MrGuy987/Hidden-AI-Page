@@ -1,51 +1,56 @@
 // Updated script.js
 
+// Complete AI-generated chat names. Here are some examples:
 const chatNames = [
-    'ChatGPT',
-    'AI Assistant',
-    'Virtual Buddy',
-    'Smart Helper',
-    'Chatbot',
-    'Friendly AI'
+    'Galactic Chat',
+    'Mystery Room',
+    'The Think Tank',
+    'Innovation Hub',
+    'Tech Talk',
+    'Creative Corner',
+    'Future Discussions',
+    'Data Dive',
+    'AI Insights',
+    'Intellect Exchange'
 ];
 
-// Right-click context menu options
-const contextMenuOptions = [
-    'Rename Chat',
-    'Close Chat'
-];
-
-// Function to display the context menu
-function showContextMenu(event) {
-    event.preventDefault();
+// Function to create context menu for renaming and closing chats
+const createContextMenu = (chatId) => {
     const menu = document.createElement('div');
-    menu.classList.add('context-menu');
+    menu.className = 'context-menu';
 
-    contextMenuOptions.forEach(option => {
-        const item = document.createElement('div');
-        item.textContent = option;
-        item.addEventListener('click', () => {
-            handleContextMenuOption(option);
-            menu.remove(); // Close menu after selection
-        });
-        menu.appendChild(item);
-    });
+    const renameOption = document.createElement('div');
+    renameOption.innerText = 'Rename Chat';
+    renameOption.onclick = () => renameChat(chatId);
+    menu.appendChild(renameOption);
+
+    const closeOption = document.createElement('div');
+    closeOption.innerText = 'Close Chat';
+    closeOption.onclick = () => closeChat(chatId);
+    menu.appendChild(closeOption);
 
     document.body.appendChild(menu);
-    menu.style.top = `${event.clientY}px`;
-    menu.style.left = `${event.clientX}px`;
-}
+};
 
-function handleContextMenuOption(option) {
-    if (option === 'Rename Chat') {
-        // Logic for renaming a chat
-        alert('Renaming chat...');
-    } else if (option === 'Close Chat') {
-        // Logic for closing a chat
-        alert('Closing chat...');
+// Hook up the right-click context menu to the chat items
+const chatItems = document.querySelectorAll('.chat-item');
+chatItems.forEach((item) => {
+    item.addEventListener('contextmenu', (event) => {
+        event.preventDefault();
+        createContextMenu(item.id);
+    });
+});
+
+function renameChat(chatId) {
+    // Logic to rename the chat
+    const newName = prompt('Enter new chat name:');
+    if (newName) {
+        document.getElementById(chatId).innerText = newName;
     }
 }
 
-// Event listener to show the context menu
-document.addEventListener('contextmenu', showContextMenu);
+function closeChat(chatId) {
+    // Logic to close the chat
+    document.getElementById(chatId).remove();
+}
 
