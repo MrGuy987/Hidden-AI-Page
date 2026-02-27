@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" data-theme="modern">
+<head>
+<script type="text/javascript">
+  WebFontConfig = {
+    google: { families: [ 'Karla:400:latin' ] }
+  };
+  (function() {
+    var h = document.getElementsByTagName('html')[0];
+    h.className += ' wf-karla-n4-loading';
+    var t = setTimeout(function() {
+      h.className = h.className.replace(/(\s|^)wf-loading(\s|$)/g, ' ');
+      h.className = h.className.replace(/(\s|^)wf-karla-n4-loading(\s|$)/g, ' ');
+      h.className += ' wf-inactive';
+    }, 2000);
+    var wf = document.createElement('script');
+    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+  })();
+</script>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="google-site-verification" content="6ystVr7sfpd20ctZGukFGunzOJQW7O6kJpXvzAxSEzI" />
+<meta name="google-site-verification" content="9tK81P_TYDOlOx_Me0FXzEj_nQnkL9G0kQxRcG4LT7I" />
+<meta name="p:domain_verify" content="d76e189f546bfd185bd2a3ec1a7f214c" />
+<link rel="shortcut icon" href="https://asset-cdn.schoology.com/sites/all/themes/schoology_theme/favicon.ico" type="image/x-icon" />
+<link rel="image_src" href="/images/schoology_thumbnail.png" />
+<link rel="stylesheet" type="text/css" href="https://asset-cdn.schoology.com/sites/all/themes/schoology_theme/theme-modern-sgy.css"/>
+<link rel="stylesheet" type="text/css" href="/sites/all/themes/schoology_theme/css/style.css?1444671451" />
+<link rel="stylesheet" type="text/css" href="sites/all/themes/schoology_theme/css/thickbox.css?qrstuv" media="screen" />
+<script type="text/javascript" src="/misc/jquery.min.js?1593450720"></script>
+<script type="text/javascript" src="/misc/jquery-html-prefilter-3.5.0-backport.js?1405525770"></script>
+<script type="text/javascript" src="/misc/drupal.js?qrstuv"></script>
+<script type="text/javascript" src="/sites/all/misc/jquery.elastic-1.6.11.js?1407513164"></script>
+<script type="text/javascript" src="/sites/all/themes/schoology_theme/js/thickbox-compressed.js?qrstuv"></script>
+<script type="text/javascript" src="/sites/all/themes/schoology_theme/js/modernizr-2.6.2.min.js?qrstuv"></script>
+<script type="text/javascript" src="/sites/all/themes/schoology_theme/js/front.js?1714416173000"></script>
+<script type="text/javascript" src="/sites/all/misc/jquery-autocomplete/jquery.autocomplete.js?qrstuv"></script>
+<script type="text/javascript" src="/sites/all/modules/schoology_core/s_user/s_user_usernames_login.js?1532547239000"></script>
+<!--[if lt IE 9]>
+<script>
+	document.createElement('header');
+	document.createElement('nav');
+	document.createElement('section');
+	document.createElement('article');
+	document.createElement('aside');
+	document.createElement('footer');
+	document.createElement('hgroup');
+	document.createElement('figure');
+	document.createElement('figcaption');
+</script>
+<![endif]-->
+<link rel="stylesheet" type="text/css" href="/sites/all/themes/schoology_theme/css/style.css?qrt" />
+<link rel="stylesheet" type="text/css" href="/sites/all/themes/schoology_theme/css/login.css?qrt" />
+<link rel="stylesheet" type="text/css" href="/sites/all/themes/schoology_theme/css/rebranded.css?qrt" />
+<title>Log in to Schoology</title>
+<meta name="description" content="Schoology allows instructors, students and administrators to create a meaningful virtual classroom and extend learning beyond the boundaries of the physical classroom" />
+<!-- Modernized Schoology Header -->
+</head>
+<body class="proxima login-page accessibility-enhanced modern-theme">
+    <header class="modern-header">
+        <div class="modern-header-content">
+            <a class="modern-header-logo" href="https://www.schoology.com/">
+                <img src="https://asset-cdn.schoology.com/sites/all/themes/schoology_theme/images_front/sgylogo.svg" alt="PowerSchool Schoology Learning Logo">
+            </a>
+        </div>
+    </header>
+<div class="modern-wrapper">
+  <div id="supplementary">
+    <div class="container">
+      <div id="content-container" class="login login">
+          <div id="main-content">
+              <div id="login-container">
+                  <div class="login-content clearfix">
+                                            <h3 class="sign-in-header">Sign in to Schoology</h3>
+                      <h3 class="forgot-header">Forgot Password</h3>
+
+                      <form action="/login?destination=home"  accept-charset="UTF-8" method="post" id="s-user-login-form">
+<div>
+        <div class="form-item">
+          <span class="required-text-label" tabindex="-1" role="text">All fields are required</span>
+        </div><div class="form-item " id="edit-mail-wrapper">
+ <label for="edit-mail">Email or Username (required): </label>
+ <input type="text" maxlength="128" name="mail" id="edit-mail" size="60" value="" placeholder="Email or Username" aria-required="true" class="form-text" />
+</div>
+<div class="form-item " id="edit-pass-wrapper">
+ <label for="edit-pass">Password (required): </label>
+ <input type="password" name="pass" id="edit-pass"  maxlength="128"  size="60"  placeholder="Password" aria-required="true" maxlength="128" autocomplete="off" class="form-text" />
+</div>
+
+        <div class="form-item" id="edit-school-wrapper">
+          <label class="hide" for="edit-school">Select Your School (required):</label>
+          <span class="loader"></span>
+          <input type="text" aria-required="true" maxlength="128" name="school" id="edit-school" size="0" autocomplete="off" value="" class="form-text" placeholder="School or Postal Code " title="School or Postal Code " />
+          <span id="clear-school-field">Clear this field</span>
+          <div id="remember-school-wrapper">
+            <label class="show option" for="remember-school"><input type="checkbox" id="remember-school" name="remember-school" value="remember-school" /> Remember my School</label>
+          </div>
+        </div><input type="hidden" name="school_nid" id="edit-school-nid" value=""  />
+<span class="submit-span-wrapper"><input type="submit" name="op" id="edit-submit" value="Log in"  class="form-submit" />
+</span><div class="forgot-password"><a href="/login/forgot">Forgot your password</a></div><div class="sso-login"><span tabindex="0" role="link" class="sso-login-link clickable">SSO Login</span><span tabindex="0" role="link" class="regular-login-link hidden">Regular Login</span></div><input type="hidden" name="form_build_id" id="ebe1e62-48azBuhwgMCN9XJohMXnFVB3VsmaOH7HlywuWyRwjNA" value="ebe1e62-48azBuhwgMCN9XJohMXnFVB3VsmaOH7HlywuWyRwjNA"  />
+<input type="hidden" name="form_id" id="edit-s-user-login-form" value="s_user_login_form"  />
+
+</div></form>
+                  </div>
+                  <div class="qr-code-signin-option">
+  <div class="qr-code-signin-or-block">
+    <span>or</span>
+    <div class="rule"></div>
+  </div>
+  <div class="scan-link-cta">
+    <img src="/sites/all/themes/schoology_theme/images/qr-scan-sample.png"
+         class="qr-code-scanning"
+         alt="QR code being scanned"
+    />
+    <a href="/login/qr?lang=en-US" aria-label="Button: Scan QR Code">
+      <div class="button"><span>Scan QR Code</span></div>
+    </a>
+  </div>
+</div>
+              </div>
+          </div>
+      </div>
+    </div>
+  </div>
+<footer class="modern-footer">
+  <div class="modern-footer-container">
+    <div class="modern-footer-links">
+      <a href="https://www.powerschool.com/privacy" target="_blank">Privacy Policy</a>
+      <span>|</span>
+      <a href="https://www.powerschool.com/wp-content/uploads/PowerSchool-Service-Agreements/2024_PowerSchool_MSA.pdf" target="_blank">Terms of Use</a>
+      <span>|</span>
+      <a href="https://help.powerschool.com" target="_blank">Help Center</a>
+    </div>
+    <div class="modern-footer-copyright">
+      PowerSchool © 2026    </div>
+  </div>
+</footer>
+
+</body>
+</html>
+</div>
+
+<script type="text/javascript">
+    // Place the cursor in the first textbox
+    $(document).ready(function(){
+      $('form input:eq(0)').focus();
+    });
+  </script>
